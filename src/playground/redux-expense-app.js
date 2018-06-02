@@ -125,6 +125,23 @@ const filtersReducer = (state = filtersReducerDefaultState, action) => {
   }
 }
 
+//get visible expenses
+const getVisibleExpenses = (expenses, {text, sortBY, startDate, endDate}) => {
+  return expenses.filter((expense) => {
+    const startDateMatch = typeof startDate !== 'number' || expense.createdAt >= startDate;
+    const endDateMatch = typeof endDate !== 'number' || expense.createdAt <= endDate;
+    const textMatch = expense.description.toLowerCase().includes(text.toLowerCase());
+    return startDateMatch && endDateMatch && textMatch
+  }).sort((a, b)=> {
+    if (sortBY === 'date') {
+      return a.createdAt < b.createdAt ? 1 : -1
+    }
+    if (sortBY === 'amount') {
+      return a.amount < b.createdAt ? 1 : -1
+    }
+  })
+}
+
 //Store Creation
 
 const store = createStore(
@@ -135,21 +152,23 @@ const store = createStore(
 )
 
 store.subscribe(() => {
-  console.log(store.getState());
+  const state = store.getState();
+  const visibleExpenses = getVisibleExpenses(state.expenses, state.filters)
+  console.log(visibleExpenses);
 })
 
-const expenseOne = store.dispatch(addExpense({description: 'Rent', amount: 100}))
-const expenseTwo = store.dispatch(addExpense({description: 'coffee', amount: 300}))
-store.dispatch(removeExpense({id: expenseOne.expense.id}))
-store.dispatch(editExpense(expenseTwo.expense.id, {amount: 500} ))
-
-store.dispatch(setTextFilter('rent'))
-store.dispatch(setTextFilter())
+const expenseOne = store.dispatch(addExpense({description: 'Rent', amount: 10000, createdAt: -2000}))
+const expenseTwo = store.dispatch(addExpense({description: 'coffee', amount: 300, createdAt: 2000}))
+// store.dispatch(removeExpense({id: expenseOne.expense.id}))
+// store.dispatch(editExpense(expenseTwo.expense.id, {amount: 500} ))
+//
+// store.dispatch(setTextFilter('rent'))
+// store.dispatch(setTextFilter())
 store.dispatch(sortByAmount())
-store.dispatch(sortByDate())
-store.dispatch(setStartDate(250))
-store.dispatch(setStartDate())
-store.dispatch(setEndDate(2500))
+// store.dispatch(sortByDate())
+// store.dispatch(setStartDate(250))
+// store.dispatch(setStartDate())
+// store.dispatch(setEndDate(2500))
 
 
 
