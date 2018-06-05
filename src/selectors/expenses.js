@@ -10,7 +10,7 @@ const getVisibleExpenses = (expenses, {text, sortBY, startDate, endDate}) => {
       return a.createdAt < b.createdAt ? 1 : -1
     }
     if (sortBY === 'amount') {
-      return a.amount < b.createdAt ? 1 : -1
+      return a.amount < b.amount ? 1 : -1
     }
   })
 }
